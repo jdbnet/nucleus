@@ -18,6 +18,7 @@ func RegisterRoutes(mux *http.ServeMux) {
 
 	mux.HandleFunc("GET /api/targets", AuthMiddleware(getTargets))
 	mux.HandleFunc("POST /api/targets", AuthMiddleware(createTarget))
+	mux.HandleFunc("PUT /api/targets/{id}", AuthMiddleware(updateTarget))
 	mux.HandleFunc("DELETE /api/targets/{id}", AuthMiddleware(deleteTarget))
 	mux.HandleFunc("POST /api/targets/{id}/scan", AuthMiddleware(triggerScan))
 	mux.HandleFunc("GET /api/scans", AuthMiddleware(getScans))
@@ -62,6 +63,33 @@ func createTarget(w http.ResponseWriter, r *http.Request) {
 	scheduler.ReloadScheduler()
 
 	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(t)
+}
+
+func updateTarget(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+
+	var t models.Target
+	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	_, err = db.DB.Exec("UPDATE targets SET name = ?, address = ?, schedule = ? WHERE id = ?", t.Name, t.Address, t.Schedule, id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	scheduler.ReloadScheduler()
+
+	w.Header().Set("Content-Type", "application/json")
+	t.ID = id
 	json.NewEncoder(w).Encode(t)
 }
 

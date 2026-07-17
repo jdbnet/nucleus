@@ -26,7 +26,10 @@
         </div>
         <div>
           <button type="submit" class="w-full bg-accent hover:bg-accent/80 text-bg font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 hover:cursor-pointer">
-            Add Target
+            {{ isEditing ? 'Update Target' : 'Add Target' }}
+          </button>
+          <button v-if="isEditing" type="button" @click="cancelEdit" class="w-full mt-2 bg-transparent border border-border-subtle text-body hover:text-heading font-medium py-1 px-4 rounded-lg transition-colors hover:cursor-pointer text-sm">
+            Cancel
           </button>
         </div>
       </form>
@@ -61,6 +64,7 @@
                 {{ target.last_scan_at ? new Date(target.last_scan_at).toLocaleString() : 'Never' }}
               </td>
               <td class="px-6 py-4 text-right space-x-3">
+                <button @click="editTarget(target)" class="text-blue-400 hover:text-blue-300 font-medium transition-colors hover:cursor-pointer">Edit</button>
                 <button @click="runScan(target.id)" class="text-accent hover:text-accent/80 font-medium transition-colors hover:cursor-pointer">Run Now</button>
                 <button @click="deleteTarget(target.id)" class="text-red-400 hover:text-red-300 font-medium transition-colors hover:cursor-pointer">Delete</button>
               </td>
@@ -79,7 +83,8 @@
 import { ref, onMounted } from 'vue'
 
 const targets = ref([])
-const form = ref({ name: '', address: '', schedule: 'manual', customSchedule: '' })
+const form = ref({ id: null, name: '', address: '', schedule: 'manual', customSchedule: '' })
+const isEditing = ref(false)
 
 const loadTargets = async () => {
   try {
@@ -101,17 +106,56 @@ const addTarget = async () => {
     }
   }
 
-  await fetch('/api/targets', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name: form.value.name,
-      address: form.value.address,
-      schedule: finalSchedule
+  if (isEditing.value) {
+    await fetch(`/api/targets/${form.value.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: form.value.name,
+        address: form.value.address,
+        schedule: finalSchedule
+      })
     })
-  })
-  form.value = { name: '', address: '', schedule: 'manual', customSchedule: '' }
+  } else {
+    await fetch('/api/targets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: form.value.name,
+        address: form.value.address,
+        schedule: finalSchedule
+      })
+    })
+  }
+
+  cancelEdit()
   loadTargets()
+}
+
+const editTarget = (target) => {
+  isEditing.value = true
+  let sched = target.schedule
+  let custom = ''
+  
+  if (['manual', '@midnight', '@hourly', '0 0 * * 0'].includes(sched)) {
+    // Standard schedule
+  } else {
+    custom = sched
+    sched = 'custom'
+  }
+
+  form.value = {
+    id: target.id,
+    name: target.name,
+    address: target.address,
+    schedule: sched,
+    customSchedule: custom
+  }
+}
+
+const cancelEdit = () => {
+  isEditing.value = false
+  form.value = { id: null, name: '', address: '', schedule: 'manual', customSchedule: '' }
 }
 
 const deleteTarget = async (id) => {
