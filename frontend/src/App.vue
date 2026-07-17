@@ -3,7 +3,7 @@
     <header class="bg-surface border-b border-border-subtle shadow-sm relative z-10">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div class="flex items-center space-x-3">
-          <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center font-bold text-bg shadow-lg border border-accent/80">N</div>
+          <img src="/favicon.svg" alt="Nucleus Logo" class="w-8 h-8 drop-shadow-md" />
           <h1 class="text-xl font-bold text-heading">Nucleus</h1>
         </div>
         <nav class="flex space-x-4">
