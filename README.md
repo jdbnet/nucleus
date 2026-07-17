@@ -9,6 +9,8 @@ It serves an embedded Vue 3 SPA web dashboard, reads/writes scan states to a loc
 
 </div>
 
+![Nucleus Dashboard Gallery](assets/gallery.gif)
+
 ## Prerequisites
 - **Go 1.22+**
 - **Node.js & npm** (for building the frontend)
