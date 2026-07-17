@@ -13,12 +13,16 @@
         </div>
         <div>
           <label class="block text-sm font-medium text-body mb-1">Schedule</label>
-          <select v-model="form.schedule" class="w-full bg-bg border border-border-subtle rounded-lg px-4 py-2 text-heading focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all">
-            <option value="manual">Manual Only</option>
-            <option value="@midnight">Daily at Midnight</option>
-            <option value="@hourly">Hourly</option>
-            <option value="0 0 * * 0">Weekly on Sunday</option>
-          </select>
+          <div class="flex space-x-2">
+            <select v-model="form.schedule" class="w-full bg-bg border border-border-subtle rounded-lg px-4 py-2 text-heading focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all">
+              <option value="manual">Manual Only</option>
+              <option value="@midnight">Daily at Midnight</option>
+              <option value="@hourly">Hourly</option>
+              <option value="0 0 * * 0">Weekly on Sunday</option>
+              <option value="custom">Custom Cron...</option>
+            </select>
+            <input v-if="form.schedule === 'custom'" v-model="form.customSchedule" type="text" placeholder="0 2 * * 1" class="w-full bg-bg border border-border-subtle rounded-lg px-4 py-2 text-heading focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all">
+          </div>
         </div>
         <div>
           <button type="submit" class="w-full bg-accent hover:bg-accent/80 text-bg font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
@@ -75,7 +79,7 @@
 import { ref, onMounted } from 'vue'
 
 const targets = ref([])
-const form = ref({ name: '', address: '', schedule: 'manual' })
+const form = ref({ name: '', address: '', schedule: 'manual', customSchedule: '' })
 
 const loadTargets = async () => {
   try {
@@ -87,12 +91,25 @@ const loadTargets = async () => {
 }
 
 const addTarget = async () => {
+  let finalSchedule = form.value.schedule
+  if (finalSchedule === 'custom') {
+    finalSchedule = form.value.customSchedule.trim()
+    if (!finalSchedule) {
+      alert('Please enter a valid custom cron expression')
+      return
+    }
+  }
+
   await fetch('/api/targets', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(form.value)
+    body: JSON.stringify({
+      name: form.value.name,
+      address: form.value.address,
+      schedule: finalSchedule
+    })
   })
-  form.value = { name: '', address: '', schedule: 'manual' }
+  form.value = { name: '', address: '', schedule: 'manual', customSchedule: '' }
   loadTargets()
 }
 
