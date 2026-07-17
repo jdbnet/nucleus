@@ -1,7 +1,10 @@
 package scheduler
 
 import (
+	"fmt"
 	"log"
+	"os"
+	"strconv"
 
 	"github.com/robfig/cron/v3"
 
@@ -15,6 +18,34 @@ var c *cron.Cron
 func InitScheduler() {
 	c = cron.New()
 	
+	// Automated Data Cleanup Job (Runs every day at midnight)
+	c.AddFunc("@daily", func() {
+		days := os.Getenv("RETENTION_DAYS")
+		if days == "" {
+			days = "30"
+		}
+		
+		retentionDays, err := strconv.Atoi(days)
+		if err != nil {
+			log.Printf("Invalid RETENTION_DAYS environment variable: %s", days)
+			retentionDays = 30
+		}
+		
+		log.Printf("Running automated cleanup (Retention: %d days)", retentionDays)
+		
+		modifier := fmt.Sprintf("-%d days", retentionDays)
+		res, err := db.DB.Exec("DELETE FROM scans WHERE started_at < date('now', ?)", modifier)
+		if err != nil {
+			log.Printf("Cleanup failed: %v", err)
+			return
+		}
+		
+		rowsAffected, _ := res.RowsAffected()
+		if rowsAffected > 0 {
+			log.Printf("Cleanup complete: removed %d old scans.", rowsAffected)
+		}
+	})
+
 	// Load all targets
 	rows, err := db.DB.Query("SELECT id, name, address, schedule FROM targets")
 	if err != nil {

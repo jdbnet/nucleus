@@ -74,6 +74,9 @@ Environment="SMTP_TO=admin@example.com"
 # Environment="WEB_USER=admin"
 # Environment="WEB_PASS=supersecret"
 
+# Optional: Number of days to retain scan history in the database (Default: 30)
+# Environment="RETENTION_DAYS=30"
+
 Restart=always
 RestartSec=5
 
