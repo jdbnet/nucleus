@@ -81,7 +81,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
   id: { type: String, required: true }
@@ -137,5 +137,14 @@ const severityClass = (sev) => {
   return map[sev] || map.info
 }
 
-onMounted(loadFindings)
+let pollInterval = null
+
+onMounted(() => {
+  loadFindings()
+  pollInterval = setInterval(loadFindings, 10000)
+})
+
+onUnmounted(() => {
+  if (pollInterval) clearInterval(pollInterval)
+})
 </script>

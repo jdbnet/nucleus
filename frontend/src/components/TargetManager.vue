@@ -80,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 const targets = ref([])
 const form = ref({ id: null, name: '', address: '', schedule: 'manual', customSchedule: '' })
@@ -170,5 +170,14 @@ const runScan = async (id) => {
   loadTargets()
 }
 
-onMounted(loadTargets)
+let pollInterval = null
+
+onMounted(() => {
+  loadTargets()
+  pollInterval = setInterval(loadTargets, 10000)
+})
+
+onUnmounted(() => {
+  if (pollInterval) clearInterval(pollInterval)
+})
 </script>

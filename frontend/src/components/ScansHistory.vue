@@ -101,7 +101,7 @@ const totalFindings = (scan) => {
 
 onMounted(() => {
   loadScans()
-  interval = setInterval(loadScans, 5000)
+  interval = setInterval(loadScans, 10000)
 })
 
 onUnmounted(() => {

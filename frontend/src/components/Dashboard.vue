@@ -55,7 +55,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js'
 import { Pie, Bar } from 'vue-chartjs'
 
@@ -140,5 +140,14 @@ const trendOptions = {
   }
 }
 
-onMounted(loadStats)
+let pollInterval = null
+
+onMounted(() => {
+  loadStats()
+  pollInterval = setInterval(loadStats, 10000)
+})
+
+onUnmounted(() => {
+  if (pollInterval) clearInterval(pollInterval)
+})
 </script>
