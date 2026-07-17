@@ -12,12 +12,16 @@ import (
 )
 
 func RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("GET /api/targets", getTargets)
-	mux.HandleFunc("POST /api/targets", createTarget)
-	mux.HandleFunc("DELETE /api/targets/{id}", deleteTarget)
-	mux.HandleFunc("POST /api/targets/{id}/scan", triggerScan)
-	mux.HandleFunc("GET /api/scans", getScans)
-	mux.HandleFunc("GET /api/scans/{id}/findings", getFindings)
+	mux.HandleFunc("POST /api/auth/login", LoginHandler)
+	mux.HandleFunc("POST /api/auth/logout", LogoutHandler)
+	mux.HandleFunc("GET /api/auth/status", StatusHandler)
+
+	mux.HandleFunc("GET /api/targets", AuthMiddleware(getTargets))
+	mux.HandleFunc("POST /api/targets", AuthMiddleware(createTarget))
+	mux.HandleFunc("DELETE /api/targets/{id}", AuthMiddleware(deleteTarget))
+	mux.HandleFunc("POST /api/targets/{id}/scan", AuthMiddleware(triggerScan))
+	mux.HandleFunc("GET /api/scans", AuthMiddleware(getScans))
+	mux.HandleFunc("GET /api/scans/{id}/findings", AuthMiddleware(getFindings))
 }
 
 func getTargets(w http.ResponseWriter, r *http.Request) {

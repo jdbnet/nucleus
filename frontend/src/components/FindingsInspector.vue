@@ -69,6 +69,7 @@ const findings = ref([])
 const loadFindings = async () => {
   try {
     const res = await fetch(`/api/scans/${props.id}/findings`)
+    if (res.status === 401) { window.location.href = '/login'; return }
     findings.value = await res.json() || []
   } catch (e) {
     console.error(e)

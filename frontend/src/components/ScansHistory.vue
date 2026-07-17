@@ -75,6 +75,7 @@ let interval = null
 const loadScans = async () => {
   try {
     const res = await fetch('/api/scans')
+    if (res.status === 401) { window.location.href = '/login'; return }
     scans.value = await res.json() || []
   } catch (e) {
     console.error(e)

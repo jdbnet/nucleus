@@ -1,8 +1,13 @@
+<div align="center">
+  <img src="frontend/public/favicon.svg" alt="Nucleus" width="64" />
+
 # Nucleus - Vulnerability Scan Orchestrator
 
 Nucleus is a single, self-contained Go binary that acts as an orchestration manager for scheduled [Nuclei](https://github.com/projectdiscovery/nuclei) vulnerability scans.
 
 It serves an embedded Vue 3 SPA web dashboard, reads/writes scan states to a local SQLite database, and automatically dispatches beautifully formatted HTML email reports via SMTP when scans discover vulnerabilities.
+
+</div>
 
 ## Prerequisites
 - **Go 1.22+**
@@ -64,6 +69,10 @@ Environment="SMTP_TO=admin@example.com"
 # Optional: Add authentication if your SMTP server requires it
 # Environment="SMTP_USER=username"
 # Environment="SMTP_PASS=password"
+
+# Optional: Add basic authentication to protect the web dashboard
+# Environment="WEB_USER=admin"
+# Environment="WEB_PASS=supersecret"
 
 Restart=always
 RestartSec=5

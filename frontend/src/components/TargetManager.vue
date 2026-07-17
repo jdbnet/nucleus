@@ -84,6 +84,7 @@ const form = ref({ name: '', address: '', schedule: 'manual', customSchedule: ''
 const loadTargets = async () => {
   try {
     const res = await fetch('/api/targets')
+    if (res.status === 401) { window.location.href = '/login'; return }
     targets.value = await res.json() || []
   } catch (e) {
     console.error(e)
