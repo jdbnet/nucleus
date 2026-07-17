@@ -11,7 +11,7 @@
     <div class="bg-surface rounded-xl overflow-hidden shadow-lg border border-border-subtle">
       <div class="px-6 py-4 border-b border-border-subtle flex justify-between items-center">
         <h3 class="text-lg font-medium text-heading">All Findings ({{ findings.length }})</h3>
-        <button @click="loadFindings" class="text-body hover:text-heading transition-colors">Refresh</button>
+        <button @click="loadFindings" class="text-body hover:text-heading transition-colors hover:cursor-pointer">Refresh</button>
       </div>
       
       <div class="overflow-x-auto">

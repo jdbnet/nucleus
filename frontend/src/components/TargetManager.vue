@@ -25,7 +25,7 @@
           </div>
         </div>
         <div>
-          <button type="submit" class="w-full bg-accent hover:bg-accent/80 text-bg font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
+          <button type="submit" class="w-full bg-accent hover:bg-accent/80 text-bg font-bold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 hover:cursor-pointer">
             Add Target
           </button>
         </div>
@@ -35,7 +35,7 @@
     <div class="bg-surface rounded-xl overflow-hidden shadow-lg border border-border-subtle">
       <div class="px-6 py-4 border-b border-border-subtle flex justify-between items-center">
         <h2 class="text-xl font-semibold text-heading">Configured Targets</h2>
-        <button @click="loadTargets" class="text-body hover:text-heading transition-colors">
+        <button @click="loadTargets" class="text-body hover:text-heading transition-colors hover:cursor-pointer">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         </button>
       </div>
@@ -61,8 +61,8 @@
                 {{ target.last_scan_at ? new Date(target.last_scan_at).toLocaleString() : 'Never' }}
               </td>
               <td class="px-6 py-4 text-right space-x-3">
-                <button @click="runScan(target.id)" class="text-accent hover:text-accent/80 font-medium transition-colors">Run Now</button>
-                <button @click="deleteTarget(target.id)" class="text-red-400 hover:text-red-300 font-medium transition-colors">Delete</button>
+                <button @click="runScan(target.id)" class="text-accent hover:text-accent/80 font-medium transition-colors hover:cursor-pointer">Run Now</button>
+                <button @click="deleteTarget(target.id)" class="text-red-400 hover:text-red-300 font-medium transition-colors hover:cursor-pointer">Delete</button>
               </td>
             </tr>
             <tr v-if="targets.length === 0">
