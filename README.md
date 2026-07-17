@@ -28,6 +28,12 @@ go mod tidy
 go build -o nucleus ./cmd/nucleus
 ```
 
+## Download
+
+The binary is availble for download from here:
+
+https://apps.jdbnet.co.uk/nucleus
+
 ## Running as a Systemd Service
 
 To keep Nucleus running continuously in the background on your VM, it is recommended to create a systemd service.
@@ -46,10 +52,8 @@ After=network.target
 
 [Service]
 Type=simple
-User=jamie
-Group=jamie
-WorkingDirectory=/home/jamie/Git/nucleus
-ExecStart=/home/jamie/Git/nucleus/nucleus
+WorkingDirectory=/opt/nucleus
+ExecStart=/opt/nucleus/nucleus
 
 # SMTP Configuration
 Environment="SMTP_HOST=localhost"
