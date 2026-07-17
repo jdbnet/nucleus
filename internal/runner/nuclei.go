@@ -3,8 +3,11 @@ package runner
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"log"
+	"net"
 	"os/exec"
+	"strings"
 	"time"
 
 	"nucleus/internal/db"
@@ -57,11 +60,23 @@ func RunScan(targetID int, isManual bool) {
 		line := scanner.Bytes()
 		var nf models.NucleiFinding
 		if err := json.Unmarshal(line, &nf); err == nil {
+			displayHost := nf.Host
+			ipStr := displayHost
+			if hostPart, _, err := net.SplitHostPort(displayHost); err == nil {
+				ipStr = hostPart
+			}
+			if ip := net.ParseIP(ipStr); ip != nil {
+				if names, err := net.LookupAddr(ip.String()); err == nil && len(names) > 0 {
+					hostname := strings.TrimSuffix(names[0], ".")
+					displayHost = fmt.Sprintf("%s (%s)", hostname, displayHost)
+				}
+			}
+
 			// Insert finding
 			res, err := db.DB.Exec(`
 				INSERT INTO findings (scan_id, template_id, name, severity, host, matched_at, description)
 				VALUES (?, ?, ?, ?, ?, ?, ?)
-			`, scanID, nf.TemplateID, nf.Info.Name, nf.Info.Severity, nf.Host, nf.MatchedAt, nf.Info.Description)
+			`, scanID, nf.TemplateID, nf.Info.Name, nf.Info.Severity, displayHost, nf.MatchedAt, nf.Info.Description)
 			
 			if err == nil {
 				fid, _ := res.LastInsertId()
@@ -71,7 +86,7 @@ func RunScan(targetID int, isManual bool) {
 					TemplateID:  nf.TemplateID,
 					Name:        nf.Info.Name,
 					Severity:    nf.Info.Severity,
-					Host:        nf.Host,
+					Host:        displayHost,
 					MatchedAt:   nf.MatchedAt,
 					Description: nf.Info.Description,
 				}
