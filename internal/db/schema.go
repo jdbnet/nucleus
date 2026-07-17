@@ -1,0 +1,34 @@
+package db
+
+const Schema = `
+CREATE TABLE IF NOT EXISTS targets (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	name TEXT NOT NULL,
+	address TEXT NOT NULL,
+	schedule TEXT NOT NULL,
+	last_scan_at DATETIME,
+	created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS scans (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	target_id INTEGER NOT NULL,
+	status TEXT NOT NULL,
+	started_at DATETIME,
+	completed_at DATETIME,
+	FOREIGN KEY(target_id) REFERENCES targets(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS findings (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	scan_id INTEGER NOT NULL,
+	template_id TEXT NOT NULL,
+	name TEXT,
+	severity TEXT,
+	host TEXT,
+	matched_at TEXT,
+	description TEXT,
+	detected_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY(scan_id) REFERENCES scans(id) ON DELETE CASCADE
+);
+`
