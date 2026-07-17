@@ -15,6 +15,8 @@ func RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/auth/login", LoginHandler)
 	mux.HandleFunc("POST /api/auth/logout", LogoutHandler)
 	mux.HandleFunc("GET /api/auth/status", StatusHandler)
+	
+	mux.HandleFunc("GET /api/dashboard/stats", AuthMiddleware(getDashboardStats))
 
 	mux.HandleFunc("GET /api/targets", AuthMiddleware(getTargets))
 	mux.HandleFunc("POST /api/targets", AuthMiddleware(createTarget))
@@ -194,4 +196,60 @@ func getFindings(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(findings)
+}
+
+func getDashboardStats(w http.ResponseWriter, r *http.Request) {
+	var stats models.DashboardStats
+	stats.Severity = map[string]int{"critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0}
+	stats.TopHosts = []models.HostCount{}
+	stats.RecentTrends = []models.TrendPoint{}
+
+	// Total Targets
+	db.DB.QueryRow("SELECT COUNT(*) FROM targets").Scan(&stats.TotalTargets)
+
+	// Total Scans
+	db.DB.QueryRow("SELECT COUNT(*) FROM scans").Scan(&stats.TotalScans)
+
+	// Severity Counts
+	rows, err := db.DB.Query("SELECT severity, COUNT(*) FROM findings GROUP BY severity")
+	if err == nil {
+		for rows.Next() {
+			var sev string
+			var count int
+			rows.Scan(&sev, &count)
+			stats.Severity[sev] = count
+		}
+		rows.Close()
+	}
+
+	// Top Hosts
+	hRows, err := db.DB.Query("SELECT host, COUNT(*) as c FROM findings GROUP BY host ORDER BY c DESC LIMIT 5")
+	if err == nil {
+		for hRows.Next() {
+			var h models.HostCount
+			hRows.Scan(&h.Host, &h.Count)
+			stats.TopHosts = append(stats.TopHosts, h)
+		}
+		hRows.Close()
+	}
+
+	// Recent Trends (Last 7 days)
+	tRows, err := db.DB.Query(`
+		SELECT DATE(detected_at) as d, COUNT(*) 
+		FROM findings 
+		WHERE detected_at >= date('now', '-7 days') 
+		GROUP BY d 
+		ORDER BY d ASC
+	`)
+	if err == nil {
+		for tRows.Next() {
+			var t models.TrendPoint
+			tRows.Scan(&t.Date, &t.Count)
+			stats.RecentTrends = append(stats.RecentTrends, t)
+		}
+		tRows.Close()
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(stats)
 }

@@ -3,10 +3,12 @@ import TargetManager from './components/TargetManager.vue'
 import ScansHistory from './components/ScansHistory.vue'
 import FindingsInspector from './components/FindingsInspector.vue'
 import Login from './components/Login.vue'
+import Dashboard from './components/Dashboard.vue'
 
 const routes = [
   { path: '/login', component: Login },
-  { path: '/', component: TargetManager, meta: { requiresAuth: true } },
+  { path: '/', component: Dashboard, meta: { requiresAuth: true } },
+  { path: '/targets', component: TargetManager, meta: { requiresAuth: true } },
   { path: '/scans', component: ScansHistory, meta: { requiresAuth: true } },
   { path: '/scans/:id', component: FindingsInspector, props: true, meta: { requiresAuth: true } }
 ]

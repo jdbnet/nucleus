@@ -45,3 +45,21 @@ type NucleiFinding struct {
 	MatchedAt string `json:"matched-at"`
 	Timestamp string `json:"timestamp"`
 }
+
+type TrendPoint struct {
+	Date  string `json:"date"`
+	Count int    `json:"count"`
+}
+
+type HostCount struct {
+	Host  string `json:"host"`
+	Count int    `json:"count"`
+}
+
+type DashboardStats struct {
+	TotalTargets int            `json:"total_targets"`
+	TotalScans   int            `json:"total_scans"`
+	Severity     map[string]int `json:"severity"`
+	TopHosts     []HostCount    `json:"top_hosts"`
+	RecentTrends []TrendPoint   `json:"recent_trends"`
+}
