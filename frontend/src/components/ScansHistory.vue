@@ -87,7 +87,10 @@ const getDuration = (start, end) => {
   const ms = new Date(end) - new Date(start)
   const sec = Math.floor(ms / 1000)
   if (sec < 60) return `${sec}s`
-  return `${Math.floor(sec / 60)}m ${sec % 60}s`
+  if (sec < 3600) return `${Math.floor(sec / 60)}m ${sec % 60}s`
+  const hours = Math.floor(sec / 3600)
+  const minutes = Math.floor((sec % 3600) / 60)
+  return `${hours}h ${minutes}m`
 }
 
 const getSeverityCount = (scan, sev) => {
