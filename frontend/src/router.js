@@ -4,13 +4,15 @@ import ScansHistory from './components/ScansHistory.vue'
 import FindingsInspector from './components/FindingsInspector.vue'
 import Login from './components/Login.vue'
 import Dashboard from './components/Dashboard.vue'
+import Settings from './components/Settings.vue'
 
 const routes = [
   { path: '/login', component: Login },
   { path: '/', component: Dashboard, meta: { requiresAuth: true } },
   { path: '/targets', component: TargetManager, meta: { requiresAuth: true } },
   { path: '/scans', component: ScansHistory, meta: { requiresAuth: true } },
-  { path: '/scans/:id', component: FindingsInspector, props: true, meta: { requiresAuth: true } }
+  { path: '/scans/:id', component: FindingsInspector, props: true, meta: { requiresAuth: true } },
+  { path: '/settings', component: Settings, meta: { requiresAuth: true } }
 ]
 
 export const router = createRouter({
@@ -24,7 +26,7 @@ router.beforeEach(async (to, from, next) => {
       const res = await fetch('/api/auth/status')
       const status = await res.json()
       if (status.auth_required && !status.authenticated) {
-        next('/login')
+        next({ path: '/login', query: { redirect: to.fullPath } })
       } else {
         next()
       }

@@ -63,3 +63,13 @@ type DashboardStats struct {
 	TopHosts     []HostCount    `json:"top_hosts"`
 	RecentTrends []TrendPoint   `json:"recent_trends"`
 }
+
+type Webhook struct {
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	Provider  string `json:"provider"`
+	URL       string `json:"url"`
+	Enabled   bool   `json:"enabled"`
+	Options   string `json:"options,omitempty"`
+	CreatedAt string `json:"created_at,omitempty"`
+}

@@ -5,9 +5,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"net/http"
-	"os"
 	"sync"
 	"time"
+
+	"nucleus/internal/config"
 )
 
 var (
@@ -23,8 +24,8 @@ func generateSession() string {
 
 func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		user := os.Getenv("WEB_USER")
-		pass := os.Getenv("WEB_PASS")
+		user := config.Get(config.KeyWebUser)
+		pass := config.Get(config.KeyWebPass)
 		if user == "" || pass == "" {
 			next(w, r)
 			return
@@ -50,8 +51,8 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	user := os.Getenv("WEB_USER")
-	pass := os.Getenv("WEB_PASS")
+	user := config.Get(config.KeyWebUser)
+	pass := config.Get(config.KeyWebPass)
 	if user == "" || pass == "" {
 		w.WriteHeader(http.StatusOK)
 		return
@@ -83,7 +84,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Now().Add(24 * time.Hour),
 		HttpOnly: true,
 	})
-	
+
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -99,13 +100,13 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Now().Add(-1 * time.Hour),
 		HttpOnly: true,
 	})
-	
+
 	w.WriteHeader(http.StatusOK)
 }
 
 func StatusHandler(w http.ResponseWriter, r *http.Request) {
-	user := os.Getenv("WEB_USER")
-	pass := os.Getenv("WEB_PASS")
+	user := config.Get(config.KeyWebUser)
+	pass := config.Get(config.KeyWebPass)
 	if user == "" || pass == "" {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{"auth_required": false, "authenticated": true}`))

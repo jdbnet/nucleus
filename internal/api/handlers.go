@@ -25,6 +25,14 @@ func RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/targets/{id}/scan", AuthMiddleware(triggerScan))
 	mux.HandleFunc("GET /api/scans", AuthMiddleware(getScans))
 	mux.HandleFunc("GET /api/scans/{id}/findings", AuthMiddleware(getFindings))
+
+	mux.HandleFunc("GET /api/settings", AuthMiddleware(getSettings))
+	mux.HandleFunc("PUT /api/settings", AuthMiddleware(updateSettings))
+	mux.HandleFunc("GET /api/webhooks", AuthMiddleware(getWebhooks))
+	mux.HandleFunc("POST /api/webhooks", AuthMiddleware(createWebhook))
+	mux.HandleFunc("PUT /api/webhooks/{id}", AuthMiddleware(updateWebhook))
+	mux.HandleFunc("DELETE /api/webhooks/{id}", AuthMiddleware(deleteWebhook))
+	mux.HandleFunc("POST /api/webhooks/{id}/test", AuthMiddleware(testWebhook))
 }
 
 func getTargets(w http.ResponseWriter, r *http.Request) {

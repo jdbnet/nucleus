@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"nucleus/internal/db"
-	"nucleus/internal/mailer"
+	"nucleus/internal/notifier"
 	"nucleus/internal/models"
 )
 
@@ -119,5 +119,5 @@ func RunScan(targetID int, _ bool) {
 	db.DB.Exec("UPDATE scans SET status = ?, completed_at = ? WHERE id = ?", status, time.Now(), scanID)
 	log.Printf("Scan completed for target %s: status=%s findings=%d", t.Name, status, len(findings))
 
-	mailer.SendReport(t, findings)
+	notifier.NotifyScanComplete(t, int(scanID), findings, status)
 }

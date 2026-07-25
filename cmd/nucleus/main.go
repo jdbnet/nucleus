@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"nucleus/internal/api"
+	"nucleus/internal/config"
 	"nucleus/internal/db"
 	"nucleus/internal/scheduler"
 )
@@ -46,6 +47,7 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	db.InitDB("app.db")
+	config.Init()
 	scheduler.InitScheduler()
 
 	mux := http.NewServeMux()

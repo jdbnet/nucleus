@@ -3,11 +3,11 @@ package scheduler
 import (
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 
 	"github.com/robfig/cron/v3"
 
+	"nucleus/internal/config"
 	"nucleus/internal/db"
 	"nucleus/internal/models"
 	"nucleus/internal/runner"
@@ -20,14 +20,11 @@ func InitScheduler() {
 	
 	// Automated Data Cleanup Job (Runs every day at midnight)
 	c.AddFunc("@daily", func() {
-		days := os.Getenv("RETENTION_DAYS")
-		if days == "" {
-			days = "30"
-		}
+		days := config.Get(config.KeyRetentionDays)
 		
 		retentionDays, err := strconv.Atoi(days)
 		if err != nil {
-			log.Printf("Invalid RETENTION_DAYS environment variable: %s", days)
+			log.Printf("Invalid retention_days setting: %s", days)
 			retentionDays = 30
 		}
 		

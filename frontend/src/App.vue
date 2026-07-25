@@ -10,6 +10,7 @@
           <router-link to="/" class="px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-border-subtle hover:text-heading" active-class="bg-bg text-accent shadow-inner" exact>Dashboard</router-link>
           <router-link to="/targets" class="px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-border-subtle hover:text-heading" active-class="bg-bg text-accent shadow-inner">Targets</router-link>
           <router-link to="/scans" class="px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-border-subtle hover:text-heading" active-class="bg-bg text-accent shadow-inner">Scans History</router-link>
+          <router-link to="/settings" class="px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-border-subtle hover:text-heading" active-class="bg-bg text-accent shadow-inner">Settings</router-link>
           <button @click="logout" class="ml-4 px-3 py-1.5 border border-border-subtle rounded-md text-sm font-medium text-body hover:text-red-400 hover:border-red-400/50 transition-colors hover:cursor-pointer">Logout</button>
         </nav>
       </div>

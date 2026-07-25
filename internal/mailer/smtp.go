@@ -6,27 +6,27 @@ import (
 	"html"
 	"log"
 	"net/smtp"
-	"os"
 	"sort"
 
+	"nucleus/internal/config"
 	"nucleus/internal/models"
 )
 
-func SendReport(target models.Target, findings []models.Finding) {
-	host := os.Getenv("SMTP_HOST")
-	port := os.Getenv("SMTP_PORT")
+func SendReport(target models.Target, findings []models.Finding, status, scanLink string) {
+	host := config.Get(config.KeySMTPHost)
+	port := config.Get(config.KeySMTPPort)
 	if host == "" || port == "" {
-		log.Println("SMTP_HOST or SMTP_PORT not set, skipping email report.")
+		log.Println("SMTP not configured, skipping email report.")
 		return
 	}
 
-	user := os.Getenv("SMTP_USER")
-	pass := os.Getenv("SMTP_PASS")
-	from := os.Getenv("SMTP_FROM")
-	to := os.Getenv("SMTP_TO")
+	user := config.Get(config.KeySMTPUser)
+	pass := config.Get(config.KeySMTPPass)
+	from := config.Get(config.KeySMTPFrom)
+	to := config.Get(config.KeySMTPTo)
 
 	if from == "" || to == "" {
-		log.Println("SMTP_FROM or SMTP_TO not set, skipping email report.")
+		log.Println("SMTP from/to not configured, skipping email report.")
 		return
 	}
 
@@ -44,13 +44,16 @@ func SendReport(target models.Target, findings []models.Finding) {
 	body.WriteString("Content-Type: text/html; charset=UTF-8\r\n\r\n")
 
 	body.WriteString("<html><body style='font-family: sans-serif;'>")
-	body.WriteString(fmt.Sprintf("<h2>Scan Report for %s (%s)</h2>", target.Name, target.Address))
-	body.WriteString("<p>The scheduled Nuclei scan has completed.</p>")
-	
+	body.WriteString(fmt.Sprintf("<h2>Scan Report for %s (%s)</h2>", html.EscapeString(target.Name), html.EscapeString(target.Address)))
+	body.WriteString(fmt.Sprintf("<p>Scan status: <strong>%s</strong></p>", html.EscapeString(status)))
+
+	if scanLink != "" {
+		body.WriteString(fmt.Sprintf("<p><a href=\"%s\" style=\"display:inline-block;padding:10px 16px;background:#1ebe8a;color:#0d1117;text-decoration:none;border-radius:6px;font-weight:bold;\">View scan</a></p>", html.EscapeString(scanLink)))
+	}
+
 	if len(findings) == 0 {
 		body.WriteString("<p>No findings were detected.</p>")
 	} else {
-		// Calculate summary
 		counts := map[string]int{"critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0}
 		for _, f := range findings {
 			counts[f.Severity]++
@@ -64,7 +67,6 @@ func SendReport(target models.Target, findings []models.Finding) {
 		if counts["info"] > 0 { body.WriteString(fmt.Sprintf("<li>Info: %d</li>", counts["info"])) }
 		body.WriteString("</ul>")
 
-		// Sort findings by severity
 		severityScore := map[string]int{"critical": 5, "high": 4, "medium": 3, "low": 2, "info": 1}
 		sort.Slice(findings, func(i, j int) bool {
 			return severityScore[findings[i].Severity] > severityScore[findings[j].Severity]
@@ -82,11 +84,11 @@ func SendReport(target models.Target, findings []models.Finding) {
 			case "low": color = "#e6f2ff"
 			case "info": color = "#f2f2f2"
 			}
-			body.WriteString(fmt.Sprintf("<tr style='background-color: %s;'><td><strong>%s</strong></td><td>%s</td><td>%s</td><td>%s</td></tr>", 
-				color, 
-				html.EscapeString(f.Severity), 
-				html.EscapeString(f.Name), 
-				html.EscapeString(f.Host), 
+			body.WriteString(fmt.Sprintf("<tr style='background-color: %s;'><td><strong>%s</strong></td><td>%s</td><td>%s</td><td>%s</td></tr>",
+				color,
+				html.EscapeString(f.Severity),
+				html.EscapeString(f.Name),
+				html.EscapeString(f.Host),
 				html.EscapeString(f.TemplateID)))
 		}
 		body.WriteString("</table>")
