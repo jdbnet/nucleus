@@ -1,9 +1,10 @@
-FROM alpine:3.24
+FROM debian:trixie-slim
 
 ARG NUCLEI_VERSION=3.11.1
 ARG TARGETPLATFORM
 
-RUN apk add --no-cache ca-certificates tzdata wget unzip \
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates wget unzip \
   && set -eux \
   && case "${TARGETPLATFORM}" in \
     linux/amd64) ARCH=amd64 ;; \
@@ -16,7 +17,10 @@ RUN apk add --no-cache ca-certificates tzdata wget unzip \
   && mv /tmp/nuclei/nuclei /usr/local/bin/nuclei \
   && chmod +x /usr/local/bin/nuclei \
   && rm -rf /tmp/nuclei.zip /tmp/nuclei \
-  && nuclei -update-templates -silent
+  && nuclei -update-templates -silent \
+  && apt-get purge -y wget unzip \
+  && apt-get autoremove -y \
+  && rm -rf /var/lib/apt/lists/*
 
 COPY ${TARGETPLATFORM}/nucleus /usr/local/bin/nucleus
 
