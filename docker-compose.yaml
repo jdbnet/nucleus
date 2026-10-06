@@ -1,0 +1,24 @@
+services:
+  nucleus:
+    image: ghcr.io/jdbnet/nucleus:latest
+    container_name: nucleus
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      # SQLite DB (app.db) and any runtime files under /app
+      - ./data:/app
+      # Optional: keep nuclei template updates across image upgrades
+      # - ./nuclei-templates:/root/nuclei-templates
+    environment:
+      # Public URL for links in notifications (also configurable in Settings)
+      # NUCLEUS_URL: https://nucleus.example.com
+      # Dashboard auth (optional; Settings page can set these too)
+      # WEB_USER: admin
+      # WEB_PASS: changeme
+      # SMTP fallbacks (optional)
+      # SMTP_HOST: mail.example.com
+      # SMTP_PORT: "587"
+      # SMTP_FROM: nucleus@example.com
+      # SMTP_TO: admin@example.com
+      # RETENTION_DAYS: "30"

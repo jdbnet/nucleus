@@ -1,0 +1,25 @@
+FROM alpine:3.24
+
+ARG NUCLEI_VERSION=3.11.1
+ARG TARGETPLATFORM
+
+RUN apk add --no-cache ca-certificates tzdata wget unzip \
+  && set -eux \
+  && case "${TARGETPLATFORM}" in \
+    linux/amd64) ARCH=amd64 ;; \
+    linux/arm64) ARCH=arm64 ;; \
+    *) echo "unsupported platform: ${TARGETPLATFORM}"; exit 1 ;; \
+  esac \
+  && wget -qO /tmp/nuclei.zip \
+    "https://github.com/projectdiscovery/nuclei/releases/download/v${NUCLEI_VERSION}/nuclei_${NUCLEI_VERSION}_linux_${ARCH}.zip" \
+  && unzip -q /tmp/nuclei.zip -d /tmp/nuclei \
+  && mv /tmp/nuclei/nuclei /usr/local/bin/nuclei \
+  && chmod +x /usr/local/bin/nuclei \
+  && rm -rf /tmp/nuclei.zip /tmp/nuclei \
+  && nuclei -update-templates -silent
+
+WORKDIR /app
+COPY ${TARGETPLATFORM}/nucleus ./nucleus
+
+EXPOSE 8080
+ENTRYPOINT ["./nucleus"]

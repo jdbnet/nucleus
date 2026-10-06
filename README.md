@@ -41,6 +41,16 @@ The binary is availble for download from here:
 
 https://apps.jdbnet.co.uk/nucleus
 
+## Docker
+
+The published image includes both **Nucleus** and the **nuclei** CLI (`ghcr.io/jdbnet/nucleus`).
+
+```bash
+docker compose up -d
+```
+
+See [`docker-compose.yaml`](docker-compose.yaml) for ports, volume mount, and optional environment variables. The dashboard listens on **8080**; persist state by mounting **`./data` → `/app`** (SQLite file `app.db`).
+
 ## Dashboard
 
 By default, the web dashboard will be available on `http://<your-vm-ip>:8080`.

@@ -1,0 +1,65 @@
+version: 2
+
+project_name: nucleus
+
+before:
+  hooks:
+    - go mod tidy
+    - bash -c 'cd frontend && (npm ci --no-audit --no-fund 2>/dev/null || npm install --no-audit --no-fund) && npm run build'
+
+builds:
+  - id: nucleus
+    main: ./cmd/nucleus
+    binary: nucleus
+    env:
+      - CGO_ENABLED=1
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X nucleus/internal/version.Version={{.Version}}
+    overrides:
+      - goos: linux
+        goarch: arm64
+        env:
+          - CGO_ENABLED=1
+          - CC=aarch64-linux-gnu-gcc
+
+archives:
+  - id: binaries
+    ids:
+      - nucleus
+    formats: [binary]
+    name_template: "nucleus-{{ .Arch }}"
+
+dockers_v2:
+  - ids:
+      - nucleus
+    dockerfile: Dockerfile.release
+    images:
+      - ghcr.io/jdbnet/nucleus
+    tags:
+      - "{{ .Version }}"
+      - "{{ if not .IsNightly }}latest{{ end }}"
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    labels:
+      org.opencontainers.image.created: "{{.Date}}"
+      org.opencontainers.image.title: "{{.ProjectName}}"
+      org.opencontainers.image.revision: "{{.FullCommit}}"
+      org.opencontainers.image.version: "{{.Version}}"
+      org.opencontainers.image.source: "https://github.com/jdbnet/nucleus"
+
+changelog:
+  disable: true
+
+release:
+  github:
+    owner: jdbnet
+    name: nucleus
