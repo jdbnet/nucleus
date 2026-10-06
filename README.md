@@ -49,7 +49,7 @@ The published image includes both **Nucleus** and the **nuclei** CLI (`ghcr.io/j
 docker compose up -d
 ```
 
-See [`docker-compose.yaml`](docker-compose.yaml) for ports, volume mount, and optional environment variables. The dashboard listens on **8080**; persist state by mounting **`./data` → `/app`** (SQLite file `app.db`).
+See [`docker-compose.yaml`](docker-compose.yaml) for ports, volume mount, and optional environment variables. The dashboard listens on **8080**; persist state by mounting **`./data` → `/data`** (SQLite file `app.db`).
 
 ## Dashboard
 

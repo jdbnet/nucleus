@@ -6,8 +6,8 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      # SQLite DB (app.db) and any runtime files under /app
-      - ./data:/app
+      # SQLite DB (app.db) is created in the container working directory (/data)
+      - ./data:/data
       # Optional: keep nuclei template updates across image upgrades
       # - ./nuclei-templates:/root/nuclei-templates
     environment:

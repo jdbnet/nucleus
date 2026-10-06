@@ -34,8 +34,8 @@ RUN apk add --no-cache ca-certificates tzdata wget unzip \
   && rm -rf /tmp/nuclei.zip /tmp/nuclei \
   && nuclei -update-templates -silent
 
-WORKDIR /app
-COPY --from=server /build/nucleus ./nucleus
+COPY --from=server /build/nucleus /usr/local/bin/nucleus
 
+WORKDIR /data
 EXPOSE 8080
-ENTRYPOINT ["./nucleus"]
+ENTRYPOINT ["nucleus"]
