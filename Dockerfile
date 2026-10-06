@@ -7,7 +7,7 @@ COPY frontend/ ./
 RUN npm run build
 
 # ── Stage 2: Build Go server ──
-FROM golang:1.26-alpine AS server
+FROM golang:1.27-alpine AS server
 RUN apk add --no-cache gcc musl-dev
 WORKDIR /build
 COPY go.mod go.sum ./
