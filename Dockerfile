@@ -1,5 +1,5 @@
 # ── Stage 1: Build Vue SPA ──
-FROM node:22-alpine AS frontend
+FROM node:24-alpine AS frontend
 WORKDIR /build
 COPY frontend/package*.json ./
 RUN npm ci --no-audit --no-fund 2>/dev/null || npm install --no-audit --no-fund
